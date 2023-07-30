@@ -4,25 +4,53 @@ const eraser = document.querySelector('#eraser')
 
 const calculator = {
     screen: screen,
+    previous: '',
+    current: '',
     operation: '',
-
+    
     addDigit(digit) {
-        if (digit === '.' && this.screen.innerText.includes('.')) {
-            return console.log('Alredy have a dot')
+        if (digit === '.' && this.current.includes('.')) {
+            return
         }
 
-        this.screen.innerText += digit
-        
-        this.operation = this.screen.innerText
+        this.current += digit
+
+        if (this.previous === '') {
+            this.screen.innerText = this.current
+        } else {
+            this.operation = this.previous + this.current 
+
+            this.screen.innerText = this.operation
+        }   
     },
 
     addOperator(operator) {
         const operators = ['+', '-', '*', '/']
 
-        if (operators.includes(operator)) {
-            this.screen.innerText += operator
-        }
+        const validation = () => {
+            const lastChar = this.previous.slice(-1)
 
+            // return (operators.includes(lastChar) ? false : true)
+
+            if (operators.includes(lastChar) === true) {
+                return false
+            } else {
+                return true
+            }
+        }
+        
+        if (validation() === true) {
+            if (operators.includes(operator)) {
+                this.current += operator
+                this.previous += this.current
+                this.current = ''
+    
+                this.screen.innerText = this.previous
+
+                console.log(this.previous.slice(-1))
+            }   
+        }
+        
         switch (operator) {
             case '=':
                 this.resolveOperation()
@@ -31,19 +59,29 @@ const calculator = {
                 this.clear()
                 break
         }
-        
     },
 
     resolveOperation() {
-        this.screen.innerText = eval(this.operation)
+        this.previous = ''
+        this.current = eval(this.operation)
+        this.screen.innerText = this.current
     },
 
     clear() {
         this.screen.innerText = ''
+        this.previous = ''
+        this.current = ''
+        this.operation = ''
     },
 
     erase() {
-        this.screen.innerText = this.screen.innerText.slice(0, -1)
+        if (this.current === '') {
+            this.previous = this.previous.slice(0, -1)
+            this.screen.innerText = this.previous
+        } else {
+            this.current = this.current.slice(0, -1)
+            this.screen.innerText = this.current
+        }
     }   
 }
 
